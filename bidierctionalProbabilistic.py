@@ -12,9 +12,8 @@ class node:
 def getRank1(): 
     perfType = "blitz"
     responseTopPlayer = requests.get(f"https://lichess.org/api/player/top/1/{perfType}")
-    global apiCalls
-    apiCalls += 1
-    #print(responseTopPlayer)
+    #global apiCalls
+    #apiCalls += 1
     if responseTopPlayer.status_code == 429:
         quit()
     topPlayerJSON = responseTopPlayer.json()
@@ -42,7 +41,7 @@ def getGamesPlayer(player, numGames = 200):
             headers={"Accept": "application/x-ndjson"}
         )
         apiCalls += 1
-        print(apiCalls)
+        print(apiCalls , "requests for information and" , gamesAnylized , "games analyzed")
     if r.status_code >= 400:
         return ("error" , [])
     
@@ -65,28 +64,19 @@ def getChildrenNodes(n , foo,checklst):
     rtn = []
     #API CALLS
     games  = getGamesPlayer(n.name, 200)
-    # print(games[3])
-    # # \apicalls
-    # print(len(games))
-    # countinggames = 0 
+
     for game in games:
-        # countinggames+=1
-        # print(countinggames)
-        # if game == games[3]:
-        #     print("pass")
+
         skipgame = False
         try: 
             game["winner"] #no winner 
             game["players"][foo(game["winner"])]["user"] #user is bot or something
         except:
             skipgame = True
+
         if not skipgame:
-            #no winner #user is bot or something
-            
-            #print(game)
-            #print(game["winner"])
             playerOfInterest = game["players"][foo(game["winner"])]["user"]["name"]
-            #print(n.name , playerOfInterest , n.name == playerOfInterest)
+
             if playerOfInterest != n.name:
                 for x in checklst:
                     if x.name == playerOfInterest:
@@ -95,18 +85,12 @@ def getChildrenNodes(n , foo,checklst):
                         sol = n.games + [game["id"]] + x.games
                         #print(sol)
                         return ("solution" , sol)
-            # for x in checklstrepeats:
-            #     if x.name == playerOfInterest:
-            #         break
-            # else:
-            #     break
 
             #get stattistics
             rating = game["players"][foo(game["winner"])]["rating"]
             newGames = n.games.copy()
             newGames.append(game["id"])
             rtn.append(node(playerOfInterest, rating, newGames))
-    #print("retur" , rtn)
     return ("continue" , rtn)
             
 def p(twodarray):
@@ -119,8 +103,8 @@ def p(twodarray):
         for y in range(len(twodarray)):
             denominator += math.e ** (alpha * y)
         probs.append(numerator/denominator)
-    #print(probs)
     choices = [x for x in range(len(probs))]
+    #print(twodarray, choices , probs)
     random_number = random.choices(choices, probs)[0]
     if len(twodarray[random_number]) == 0:
         del twodarray[random_number]
@@ -128,27 +112,30 @@ def p(twodarray):
     else:
         ChosenNode = twodarray[random_number][0]
     del twodarray[random_number][0]
-    #print(ChosenNode , random_number)
     return (ChosenNode , twodarray, random_number)
 
-#setup the highlist or lowlist for expansion
+def isEmpty(TwoDlist):
+    for l in TwoDlist:
+        if len(l) != 0:
+            return False
+    return True
+
 def getPath(lowLst , highLst):
-    lowVisited = [] 
-    highVisited = [] 
+    lowVisited = [] #lowLst[0][0]
+    highVisited = [] #highLst[0][0]
     while True:
         key = lambda n : n.rank
         for l in range(len(lowLst)):
             lowLst[l].sort(key = key , reverse = True) 
         for l in range(len(highLst)):
             highLst[l].sort(key = key) 
-        
+        if isEmpty(lowLst):
+            return None
         pickedVal,lowLst,picked_depth= p(lowLst)
         if pickedVal.name not in [x.name for x in lowVisited]:
             foo = lambda x : ("black" if x == "white" else "white") 
-            status , package = getChildrenNodes(pickedVal, foo, highVisited ) 
-            # if len(package) == 0:
-            #     print(pickedVal,lowLst,picked_depth)
-            #     print(lowVisited)
+            status , package = getChildrenNodes(pickedVal, foo, highVisited )
+            #print(package) 
             lowVisited.append(pickedVal)
             if status == "solution":
                 return package
@@ -156,16 +143,16 @@ def getPath(lowLst , highLst):
                 if len(lowLst) == picked_depth+1:
                     lowLst.append([])
                 lowLst[picked_depth+1] += package
-
+        if isEmpty(highLst):
+            return None
         pickedVal,highLst,picked_depth= p(highLst)
         if pickedVal.name not in [x.name for x in highVisited]:
             foo = lambda x : x
             status , package = getChildrenNodes(pickedVal, foo, lowVisited) 
-            #if len(package) == 0:
-                #print(pickedVal,lowLst,picked_depth)
-                #print(lowVisited)
+            #print(package) 
             highVisited.append(pickedVal)
             if status == "solution":
+                package.reverse()
                 return package
             else:
                 if len(highLst) == picked_depth+1:
@@ -173,23 +160,27 @@ def getPath(lowLst , highLst):
                 highLst[picked_depth+1] += package
 
 
-def main():
+def main(sp):
     t1 = time.time()
-    #aerodaktil
-    #Cant_Stop18
     name , rank = getRank1()
     goal = node(name,rank)
-    sp = getStartingPlayer()
+    lst = []
+
+    global apiCalls, gamesAnylized
+    apiCalls = 0
+    gamesAnylized=0
     random.seed(sp)
     start = node(sp , 0)
     path = getPath([[start]] , [[goal]])
     t2 = time.time()
-    print("solution found!" , "path length:", len(path) , "time elapsed:" , f"{t2-t1:.2f}" , "seconds")
-    for x in path:
-        print("https://lichess.org/" + x)
-main()
+    # lst.append((len(path) , apiCalls , t2-t1))
+    if path is not None:
+        print("solution found!" , "path length:", len(path) , "time elapsed:" , f"{t2-t1:.2f}" , "seconds")
+        for x in path:
+            print("https://lichess.org/" + x)
+        return (len(path) , f"{t2-t1:.2f}" , apiCalls, gamesAnylized , path)
+    return None
 
-# foo = lambda x : ("black" if x == "white" else "white")
-# foo = lambda x : x
-# print("\n\n")
-# print (getChildrenNodes(node("SaySomething12", 0) , foo , []))
+
+sp = getStartingPlayer()
+main(sp)
