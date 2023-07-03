@@ -14,7 +14,7 @@ This project used a decay parameter (alpha) of -1 as oposed to the twitter algor
 
 <h2> Results</h2>
 
-When tested on 60 random lichess users I found:
+When tested on 60 random lichess users I found:\
 Average path length: 5.85\
 Average API calls: 76.98\
 Average games analyzed: 14,848.48
