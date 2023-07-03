@@ -8,7 +8,7 @@ The Chess Degrees of Separation project calculates the "degrees of separation" b
 
 The project uses a probabilistic bidierectional search alogithm that does not strictly enfore a breadth first constraint and instead prioritizes expanding nodes of low depth while occasionaly takeing greedy steps. The following formula considers all current expanded node depths and probabilisticly determines which depth of node to expand next.
 
-![image.png](attachment:image.png)
+![image.png](attachment:image1.png)
 
 This project used a decay parameter (alpha) of -1 as oposed to the twitter algorithm's decay parametter of -2. an alpha of -1 increases chance of greedy steps favoring nodes of higher depth slightly more then a decay paramter of -2. When a node depth is chosen nodes of that depth are sorted by their player ranking. This heuristic is based off the assumption that ranking is correlated with player skill and higher rated players are going to be more likely to be matched with and beat the higest rated players and thus a shorter distance away from the eventual top rated player. 
 
@@ -19,7 +19,7 @@ Average path length: 5.85\
 Average API calls: 76.98\
 Average games analyzed: 14,848.48
 
-![image.png](attachment:image.png)
+![image.png](attachment:results.png)
 
 
 ```python
