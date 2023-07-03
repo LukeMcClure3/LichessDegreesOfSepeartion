@@ -1,25 +1,18 @@
-<h1> Lichess Degrees of Sepeartion</h1>
+<h1> Lichess Degrees of Separation</h1>
 
 <h2> Overview</h2>
 
-The Chess Degrees of Separation project calculates the "degrees of separation" between players on the popular chess site lichess.com. the goal is to find a path with chain of wins from a starting player to the top player to show how a user has "beaten" the top player.This concept is inspired by the paper "Degrees of Separation in Social Networks."
+The Chess Degrees of Separation project calculates the "degrees of separation" between players on the popular chess site lichess.com. The goal is to find a path with a chain of wins from a starting player to the top player to show how a user has "beaten" the top player. This concept is inspired by the paper "Degrees of Separation in Social Networks" which finds the degrees of connection of twitter users based on mutual friends. 
 
 <h2>Algorithm</h2>
 
-The project uses a probabilistic bidierectional search alogithm that does not strictly enfore a breadth first constraint and instead prioritizes expanding nodes of low depth while occasionaly takeing greedy steps. The following formula considers all current expanded node depths and probabilisticly determines which depth of node to expand next.
+The project uses a probabilistic bidirectional search algorithm that does not strictly enforce a breadth first constraint and instead prioritizes expanding nodes of low depth while occasionally taking greedy steps. The following formula considers all current expanded node depths and probabilistically determines which depth of node to expand next.
 
 ![image.png](image1.PNG)
 
-This project used a decay parameter (alpha) of -1 as oposed to the twitter algorithm's decay parametter of -2. an alpha of -1 increases chance of greedy steps favoring nodes of higher depth slightly more then a decay paramter of -2. When a node depth is chosen nodes of that depth are sorted by their player ranking. This heuristic is based off the assumption that ranking is correlated with player skill and higher rated players are going to be more likely to be matched with and beat the higest rated players and thus a shorter distance away from the eventual top rated player. 
-
-<h2> Results</h2>
-
-When tested on 60 random lichess users I found:\
-Average path length: 5.85\
-Average API calls: 76.98\
-Average games analyzed: 14,848.48
-
-![image.png](results.PNG)
+This project used a decay parameter (alpha) of -1 as opposed to the twitter algorithm's decay parameter of -2. an alpha of -1 increases the chance of greedy steps favoring nodes of higher depth slightly more than a decay parameter of -2. When a node depth is chosen, nodes of that depth are sorted by their player ranking. This heuristic is based on the assumption that ranking is correlated with player skill and higher rated players are going to be more likely to be matched with and beat the highest rated players and thus a shorter distance away from the eventual top rated player. \
+\
+Using the Lichess public API limits the number of games we can download per ip address to just 20/s. We chose to download just the 200 most recent games per player for a total of 10s to expand each node. Although 200 games are downloaded, the lichess public API doesn't have a convenient way to only download wins or losses meaning over half of our 20 games a second will be wasted to draws or losses.
 
 
 ```python
