@@ -12,7 +12,7 @@ The project uses a probabilistic bidirectional search algorithm that does not st
 
 This project used a decay parameter (alpha) of -1 as opposed to the twitter algorithm's decay parameter of -2. an alpha of -1 increases the chance of greedy steps favoring nodes of higher depth slightly more than a decay parameter of -2. When a node depth is chosen, nodes of that depth are sorted by their player ranking. This heuristic is based on the assumption that ranking is correlated with player skill and higher rated players are going to be more likely to be matched with and beat the highest rated players and thus a shorter distance away from the eventual top rated player. \
 \
-Using the Lichess public API limits the number of games we can download per ip address to just 20/s. We chose to download just the 200 most recent games per player for a total of 10s to expand each node. Although 200 games are downloaded, the lichess public API doesn't have a convenient way to only download wins or losses meaning over half of our 20 games a second will be wasted to draws or losses.
+Using the Lichess public API limits the number of games we can download per ip address to just 20 games/s. We chose to download just the 200 most recent games per player for a total of 10s to expand each node. Although 200 games are downloaded, the lichess public API doesn't have a convenient way to only download wins or losses meaning over half of our 20 games a second will be wasted to draws or losses.
 
 
 ```python
